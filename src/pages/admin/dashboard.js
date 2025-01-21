@@ -1,3 +1,4 @@
+import withAuth from '@/lib/middleware/withAuth';
 import React from 'react';
 
 const AdminDashboard = () => {
@@ -91,4 +92,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default withAuth(AdminDashboard);

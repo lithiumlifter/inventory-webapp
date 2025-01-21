@@ -1,3 +1,4 @@
+import withAuth from '@/lib/middleware/withAuth';
 import React from 'react';
 
 const AdminProducts = () => {
@@ -13,4 +14,4 @@ const AdminProducts = () => {
   );
 };
 
-export default AdminProducts;
+export default withAuth(AdminProducts);

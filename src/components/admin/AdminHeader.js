@@ -1,7 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import useUser from '@/hooks/useUser';
 
 const AdminHeader = () => {
+  const router = useRouter();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/');
+  };
+
+  const {user, loading, error} = useUser();
+
   return (
     <div className="main-header">
       <div className="logo-header">
@@ -76,11 +86,21 @@ const AdminHeader = () => {
             <li className="nav-item dropdown">
               <Link href="#" className="dropdown-toggle profile-pic" style={{ textDecoration: 'none' }} data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="/img/profile.jpg" alt="user-img" width={36} className="img-circle" />
-                <span>Hizrian</span>
+                  {loading ? (
+                    <p>Loading...</p>
+                  ) : error ? (
+                    <p>Error: {error}</p>
+                  ) : user ? (
+                    <span>
+                      {user.nama_user}
+                    </span>
+                  ) : (
+                    <span>Guest</span>
+                  )}
               </Link>
               {/* Dropdown menu */}
               <ul className="dropdown-menu dropdown-user">
-                <Link href="#" className="dropdown-item"><i className="fa fa-power-off" /> Logout</Link>
+                <Link href="#" className="dropdown-item" onClick={handleLogout}><i className="fa fa-power-off" /> Logout</Link>
               </ul>
             </li>
           </ul>

@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import useUser from '@/hooks/useUser';
 
 const AdminSidebar = () => {
   const router = useRouter();
-
   const isActive = (path) => {
     return router.pathname === path ? 'active' : '';
   };
+
+  const {user, error, loading} = useUser();
   
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -23,7 +25,17 @@ const AdminSidebar = () => {
                 <div className="info">
                   <Link href="#userMenu" className="d-block" data-bs-toggle="collapse" aria-expanded="false" aria-controls="userMenu" style={{ textDecoration: 'none' }}>
                     <span>
-                      Hizrian
+                        {loading ? (
+                        <p>Loading...</p>
+                      ) : error ? (
+                        <p>Error: {error}</p>
+                      ) : user ? (
+                        <span>
+                          {user.nama_user}
+                        </span>
+                      ) : (
+                        <span>Guest</span>
+                      )}
                       <span className="user-level">Administrator</span>
                     </span>
                   </Link>

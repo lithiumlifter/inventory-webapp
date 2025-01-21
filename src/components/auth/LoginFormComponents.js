@@ -1,13 +1,56 @@
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+
 const LoginForm = () => {
+  const [namaUser, setNamaUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!namaUser || !password) {
+      setErrorMessage('Nama pengguna dan password diperlukan');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nama_user: namaUser, password: password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Simpan token JWT di localStorage
+        localStorage.setItem('token', result.token);
+        // alert('Login berhasil');
+        router.push('/admin/dashboard');
+      } else {
+        setErrorMessage(result.error || 'Login gagal');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMessage('Terjadi kesalahan saat login');
+    }
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <label htmlFor="email" className="form-label">Email</label>
+        <label htmlFor="nama_user" className="form-label">Username</label>
         <input
-          type="email"
+          type="text"
           className="form-control"
-          id="email"
-          placeholder="rizkycavendio@example.com"
+          id="nama_user"
+          placeholder="Masukkan username"
+          value={namaUser}
+          onChange={(e) => setNamaUser(e.target.value)}
           required
         />
       </div>
@@ -17,17 +60,17 @@ const LoginForm = () => {
           type="password"
           className="form-control"
           id="password"
-          placeholder="Password"
+          placeholder="Masukkan password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
       </div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <input type="checkbox" id="rememberMe" />
-          <label htmlFor="rememberMe" className="ms-2">Remember me</label>
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
         </div>
-        <a href="#" className="text-decoration-none">Forgot password?</a>
-      </div>
+      )}
       <button type="submit" className="btn btn-primary w-100">LOGIN</button>
     </form>
   );

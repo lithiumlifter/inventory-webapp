@@ -1,3 +1,4 @@
+import withAuth from '@/lib/middleware/withAuth';
 import React from 'react';
 
 const AdminCategories = () => {
@@ -13,4 +14,4 @@ const AdminCategories = () => {
   );
 };
 
-export default AdminCategories;
+export default withAuth(AdminCategories);

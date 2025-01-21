@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useRouter } from 'next/router'; 
 import Head from 'next/head';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Script from 'next/script';
@@ -7,10 +8,14 @@ import AdminHeader from '../components/admin/AdminHeader';
 import AdminFooter from '../components/admin/AdminFooter';
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
+
   useEffect(() => {
     import('bootstrap/dist/js/bootstrap.bundle.min.js');
     
   }, []);
+
+  const isLoginPage = router.pathname === '/';
 
   return (
     <>
@@ -50,16 +55,18 @@ export default function App({ Component, pageProps }) {
       <Script src="/js/plugin/chart-circle/circles.min.js" strategy="beforeInteractive"></Script> 
       <Script src="/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js" strategy="beforeInteractive"></Script> */}
 
-      {/* Layout Umum */}
-      <div className="wrapper">
-        <AdminHeader />
-        <AdminSidebar />
-        <div className="main-panel">
-          {/* Konten halaman yang berubah per rute */}
-          <Component {...pageProps} />
-          <AdminFooter />
+      {!isLoginPage ? (
+        <div className="wrapper">
+          <AdminHeader />
+          <AdminSidebar />
+          <div className="main-panel">
+            <Component {...pageProps} />
+            <AdminFooter />
+          </div>
         </div>
-      </div>
+      ) : (
+        <Component {...pageProps} />
+      )}
     </>
   );
 }
