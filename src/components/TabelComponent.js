@@ -2,7 +2,7 @@ import React from 'react';
 import DataTable from 'react-data-table-component';
 import { Button } from 'react-bootstrap';
 
-const TableComponent = ({ columns, data, loading, onEdit, onDelete, onCreate }) => {
+const TableComponent = ({ columns, data, loading, onSearch ,onEdit, onDelete, onCreate }) => {
   return (
     <div className="table-responsive" style={{ backgroundColor: 'white', borderRadius: '8px' }}>
       <DataTable
@@ -18,6 +18,7 @@ const TableComponent = ({ columns, data, loading, onEdit, onDelete, onCreate }) 
               type="text"
               placeholder="Search"
               className="form-control w-25"
+              onChange={(e) => onSearch(e.target.value)}
             />
             <Button variant="success" onClick={onCreate}>Create New</Button>
           </div>

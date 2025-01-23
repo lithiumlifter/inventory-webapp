@@ -27,13 +27,48 @@ const ModalComponent = ({
           fields.map((field, index) => (
             <div className="form-group" key={index}>
               <label htmlFor={field.name}>{field.label}</label>
-              <input
-                type="text"
-                id={field.name}
-                className="form-control"
-                value={field.value}
-                onChange={(e) => onChange(field.name, e.target.value)}
-              />
+
+              {/* Custom rendering based on input type */}
+              {field.type === 'select' ? (
+                <select
+                  id={field.name}
+                  className="form-control"
+                  value={field.value}
+                  onChange={(e) => onChange(field.name, e.target.value)}
+                >
+                  <option value="">Select {field.label}</option>
+                  {field.options?.map((option, idx) => (
+                    <option key={idx} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : field.type === 'file' ? (
+                <input
+                  type="file"
+                  id={field.name}
+                  className="form-control"
+                  onChange={(e) => onChange(field.name, e.target.files[0])}
+                />
+              ) : field.type === 'number' ? (
+                <>
+                  <input
+                    type="number"
+                    id={field.name}
+                    className="form-control"
+                    value={field.value ?? 0}
+                    onChange={(e) => onChange(field.name, parseInt(e.target.value))}
+                  />
+                </>
+              ) : (
+                <input
+                  type="text"
+                  id={field.name}
+                  className="form-control"
+                  value={field.value}
+                  onChange={(e) => onChange(field.name, e.target.value)}
+                />
+              )}
             </div>
           ))
         )}

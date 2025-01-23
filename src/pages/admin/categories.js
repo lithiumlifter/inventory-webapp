@@ -1,3 +1,4 @@
+import withAuth from '@/lib/middleware/withAuth';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
@@ -141,6 +142,7 @@ const AdminCategories = () => {
         data={filteredCategories}
         loading={loading}
         onCreate={() => { setIsEdit(false); setCurrentCategory({ id_kategori: '', nama_kategori: '' }); setModalShow(true); }}
+        onSearch={(value) => setSearch(value)}
       />
       
       <ModalComponent
@@ -165,4 +167,4 @@ const AdminCategories = () => {
   );
 };
 
-export default AdminCategories;
+export default withAuth(AdminCategories);

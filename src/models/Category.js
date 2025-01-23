@@ -16,4 +16,8 @@ const Kategori = sequelize.define('tbl_kategori', {
   timestamps: true,
 });
 
+Kategori.associate = (models) => {
+  Kategori.hasMany(models.Produk, { foreignKey: 'id_kategori' });
+};
+
 export default Kategori;
