@@ -1,0 +1,21 @@
+/* ModalComponent.css */
+.dropzone {
+    border: 2px dashed #007bff;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .dropzone p {
+    color: #007bff;
+  }
+  
+  .image-preview {
+    display: inline-block;
+    margin: 5px;
+  }
+  
+  .image-preview img {
+    border-radius: 5px;
+  }
+  

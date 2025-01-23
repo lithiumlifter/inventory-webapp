@@ -5,6 +5,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import TableComponent from '../../components/TabelComponent';
 import ModalComponent from '../../components/ModalComponent';
 import AlertMessage from '../../components/AlertMessageComponent'; 
+import ImageModal from '../../components/ImageModalComponent'; 
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -54,25 +55,48 @@ const AdminProducts = () => {
     fetchCategories();
   }, []);
 
+  // Inisiasi Tabel
   const productColumns = [
     { name: 'ID Produk', selector: row => row.id_produk, sortable: true },
     { name: 'Nama Produk', selector: row => row.nama_produk, sortable: true },
     { name: 'Kode Produk', selector: row => row.kode_produk, sortable: true },
-    { name: 'Foto Produk', 
-      selector: row => <img src={`/images/products/${row.foto_produk}`} alt={row.nama_produk} width="50" />, 
-      sortable: true 
+    {
+      name: 'Foto Produk',
+      selector: row => {
+        let photos = [];
+  
+        if (row.foto_produk) {
+          try {
+            photos = JSON.parse(row.foto_produk);
+          } catch (error) {
+            console.error('Failed to parse foto_produk:', error);
+          }
+        }
+  
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', }}>
+            {photos.map((photo, index) => (
+              <ImageModal key={index} image={photo} />
+            ))}
+          </div>
+        );
+      },
+      sortable: false,
     },
-    { name: 'Tanggal Register', 
-      selector: row => new Date(row.tgl_register).toLocaleString(), 
-      sortable: true 
+    {
+      name: 'Tanggal Register',
+      selector: row => new Date(row.tgl_register).toLocaleString(),
+      sortable: true,
     },
-    { name: 'Kategori', 
-      selector: row => row.kategori?.nama_kategori || 'Uncategorized', 
-      sortable: true 
+    {
+      name: 'Kategori',
+      selector: row => row.kategori?.nama_kategori || 'Uncategorized',
+      sortable: true,
     },
-    { name: 'Jumlah Barang', 
-      selector: row => row.stok?.jumlah_barang || 'N/A', 
-      sortable: true 
+    {
+      name: 'Jumlah Barang',
+      selector: row => row.stok?.jumlah_barang || 'N/A',
+      sortable: true,
     },
     {
       name: 'Action',
@@ -97,35 +121,74 @@ const AdminProducts = () => {
   };
 
   const handleSave = async () => {
-    console.log("CEK ISI:",currentProduct);
+    const convertFileToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    };
+  
+    const isUpdate = !!currentProduct.id_produk;
+    const endpoint = isUpdate 
+      ? `/api/admin/products/update/${currentProduct.id_produk}`
+      : '/api/admin/products/create';
+
+  
+    const method = isUpdate ? 'PUT' : 'POST';
+
+    console.log('Endpoint yang dipanggil:', endpoint); 
+    console.log('Metode yang digunakan:', method);
+  
+    const base64Images = [];
+  
+    // Konversi foto_produk ke base64 atau langsung gunakan jika string
+    for (let file of currentProduct.foto_produk) {
+      if (typeof file === 'string') {
+        base64Images.push(file);
+      } else {
+        const base64 = await convertFileToBase64(file);
+        base64Images.push(base64);
+      }
+    }
+  
+    const productData = {
+      nama_produk: currentProduct.nama_produk,
+      kode_produk: currentProduct.kode_produk,
+      id_kategori: currentProduct.id_kategori,
+      jumlah_barang: currentProduct.jumlah_barang,
+      foto_produk: base64Images,
+    };
+  
+    console.log("Product Data to Send:", productData);
+  
     try {
-      const payload = {
-        nama_produk: currentProduct.nama_produk,
-        kode_produk: currentProduct.kode_produk,
-        id_kategori: currentProduct.id_kategori,
-        jumlah_barang: currentProduct.jumlah_barang,
-      };
-  
-      console.log('Payload:', payload);
-  
-      const response = await fetch('/api/admin/products/create', {
-        method: 'POST',
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(productData),
       });
   
       const data = await response.json();
-      console.log('Response:', data);
-  
       if (response.ok) {
-        setAlertMessage('Product created successfully');
+        setAlertMessage(isUpdate ? 'Product updated successfully' : 'Product created successfully');
         setAlertType('success');
         setModalShow(false);
-        setProducts([...products, data]);
+  
+        if (isUpdate) {
+          setProducts((prevProducts) =>
+            prevProducts.map((product) =>
+              product.id === currentProduct.id ? data.product : product
+            )
+          );
+        } else {
+          setProducts([...products, data.product]);
+        }
       } else {
-        setAlertMessage(data.message || 'Failed to create product');
+        setAlertMessage(data.message || 'Failed to save product');
         setAlertType('danger');
       }
     } catch (error) {
@@ -135,14 +198,42 @@ const AdminProducts = () => {
     }
   };
   
-  const confirmDelete = () => {
-    setDeleteModalShow(false);
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`/api/admin/products/delete/${currentProduct.id_produk}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        setAlertMessage('Product deleted successfully');
+        setAlertType('success');
+        setProducts(products.filter(product => product.id_produk !== currentProduct.id_produk));
+      } else {
+        const data = await response.json();
+        setAlertMessage(data.message || 'Failed to delete product');
+        setAlertType('danger');
+      }
+  
+      setDeleteModalShow(false);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setAlertMessage('Failed to delete product');
+      setAlertType('danger');
+      setDeleteModalShow(false);
+    }
   };
+  
 
   const productFields = [
     { name: 'nama_produk', label: 'Product Name', value: currentProduct.nama_produk || '', type: 'text' },
     { name: 'kode_produk', label: 'Product Code', value: currentProduct.kode_produk || '', type: 'text' },
-    { name: 'foto_produk', label: 'Product Image', value: currentProduct.foto_produk || '', type: 'file' },
+    { 
+      name: 'foto_produk', 
+      label: 'Product Images', 
+      value: currentProduct.foto_produk || '', 
+      type: 'file', 
+      multiple: true
+    },
     { 
       name: 'id_kategori', 
       label: 'Category', 
@@ -157,7 +248,6 @@ const AdminProducts = () => {
       type: 'number'
     },
   ];
-  
 
   return (
     <div className="content">
@@ -181,14 +271,22 @@ const AdminProducts = () => {
           value: currentProduct[field.name] ?? field.value,
         }))}
         onChange={(field, value) => {
-          console.log(`Field: ${field}, Value: ${value}`);
-          setCurrentProduct(prevState => ({
-            ...prevState,
-            [field]: value
-          }));
+          if (field === 'foto_produk') {
+            setCurrentProduct(prevState => ({
+              ...prevState,
+              [field]: value
+            }));
+          } else {
+            setCurrentProduct(prevState => ({
+              ...prevState,
+              [field]: value
+            }));
+          }
         }}
         isEdit={isEdit}
+        currentProduct={currentProduct}
       />
+
 
       <ModalComponent
         show={deleteModalShow}

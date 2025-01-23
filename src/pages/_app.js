@@ -6,6 +6,9 @@ import Script from 'next/script';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
 import AdminFooter from '../components/admin/AdminFooter';
+import '../styles/ModalComponent.css';
+// import "slick-carousel/slick/slick.css";
+// import "slick-carousel/slick/slick-theme.css";
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
