@@ -121,6 +121,8 @@ const AdminCategories = () => {
 
   return (
     <div className="content">
+      <h4 className="page-title">Kategori</h4>
+
       <AlertMessage message={alertMessage} type={alertType} onClose={() => setAlertMessage('')} />
 
       <TableComponent
@@ -143,6 +145,7 @@ const AdminCategories = () => {
         loading={loading}
         onCreate={() => { setIsEdit(false); setCurrentCategory({ id_kategori: '', nama_kategori: '' }); setModalShow(true); }}
         onSearch={(value) => setSearch(value)}
+        showCreateButton={true}
       />
       
       <ModalComponent

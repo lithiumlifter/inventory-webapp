@@ -63,27 +63,9 @@ const AdminSidebar = () => {
                 <li className={`nav-item ${isActive('/admin/reports')}`}>
                   <Link href="/admin/reports" className="nav-link">
                     <i className="la la-th" />
-                    <p>Report</p>
+                    <p>Laporan</p>
                   </Link>
                 </li>
-                {/* <li className="nav-item">
-                  <Link href="notifications.html" className="nav-link">
-                    <i className="la la-bell" />
-                    <p>Notifications</p>
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="typography.html" className="nav-link">
-                    <i className="la la-font" />
-                    <p>Typography</p>
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="icons.html" className="nav-link">
-                    <i className="la la-fonticons" />
-                    <p>Icons</p>
-                  </Link>
-                </li> */}
               </ul>
             </div>
           </div>

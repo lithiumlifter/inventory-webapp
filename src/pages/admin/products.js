@@ -251,6 +251,8 @@ const AdminProducts = () => {
 
   return (
     <div className="content">
+      <h4 className="page-title">Produk</h4>
+
       <AlertMessage message={alertMessage} type={alertType} onClose={() => setAlertMessage('')} />
 
       <TableComponent
@@ -259,6 +261,7 @@ const AdminProducts = () => {
         loading={loading}
         onCreate={() => { setIsEdit(false); setCurrentProduct({ id_produk: '', nama_produk: '' }); setModalShow(true); }}
         onSearch={(value) => setSearch(value)}
+        showCreateButton={true}
       />
 
       <ModalComponent
